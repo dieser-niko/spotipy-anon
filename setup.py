@@ -15,7 +15,7 @@ setup(
     author_email="dieserniko@gmx.de",
     url='https://github.com/dieser-niko/spotipy-anon',
     project_urls={
-        'Source': 'https://github.com/dieserniko/spotipy-anon',
+        'Source': 'https://github.com/dieser-niko/spotipy-anon',
     },
     install_requires=["spotipy>=2.23.0"],
     license='MIT',
