@@ -8,7 +8,7 @@ import logging
 
 import requests
 from spotipy.oauth2 import SpotifyAuthBase
-from spotipy.cache_handler import CacheFileHandler, CacheHandler
+from spotipy.cache_handler import MemoryCacheHandler, CacheHandler
 
 logger = logging.getLogger(__name__)
 
@@ -55,7 +55,7 @@ class SpotifyAnon(SpotifyAuthBase):
                 + " != " + str(CacheHandler)
             self.cache_handler = cache_handler
         else:
-            self.cache_handler = CacheFileHandler()
+            self.cache_handler = MemoryCacheHandler()
 
     def get_access_token(self, as_dict=False, check_cache=True):
         """
