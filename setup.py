@@ -12,7 +12,7 @@ setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     author="@dieserniko",
-    author_email="hello@dieserniko.me",
+    author_email="hello@dieserniko.link",
     url='https://github.com/dieser-niko/spotipy-anon',
     project_urls={
         'Source': 'https://github.com/dieser-niko/spotipy-anon',
