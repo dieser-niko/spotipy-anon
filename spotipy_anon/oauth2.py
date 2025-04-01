@@ -2,15 +2,61 @@
 
 __all__ = ["SpotifyAnon"]
 
-
-import warnings
+import hashlib
+import hmac
 import logging
+import time
+import warnings
 
 import requests
-from spotipy.oauth2 import SpotifyAuthBase
+
 from spotipy.cache_handler import MemoryCacheHandler, CacheHandler
+from spotipy.oauth2 import SpotifyAuthBase
 
 logger = logging.getLogger(__name__)
+
+
+def hmac_function(algorithm, key, data):
+    if algorithm == 'sha1':
+        return hmac.new(key, data, hashlib.sha1).digest()
+    elif algorithm == 'sha256':
+        return hmac.new(key, data, hashlib.sha256).digest()
+    elif algorithm == 'sha512':
+        return hmac.new(key, data, hashlib.sha512).digest()
+    else:
+        raise ValueError('Unsupported algorithm')
+
+
+def counter_to_bytes(counter):
+    result = bytearray(8)
+    for i in range(7, -1, -1):
+        result[i] = counter & 0xff
+        counter >>= 8
+    return bytes(result)
+
+
+def generate(secret, algorithm='sha1', digits=6, counter=0):
+    hmac_result = hmac_function(algorithm, secret, counter_to_bytes(counter))
+    offset = hmac_result[-1] & 0xf
+    binary = ((hmac_result[offset] & 0x7f) << 24 |
+              (hmac_result[offset + 1] & 0xff) << 16 |
+              (hmac_result[offset + 2] & 0xff) << 8 |
+              (hmac_result[offset + 3] & 0xff))
+
+    otp = binary % (10 ** digits)
+    return str(otp).zfill(digits)
+
+
+def get_secret(inp):
+    secret = []
+    for index, item in enumerate(inp):
+        secret.append(str(item ^ ((index % 33) + 9)))
+    return [ord(item) for item in str("".join(secret))]
+
+
+def get_totp():
+    s = get_secret([12, 56, 76, 33, 88, 44, 88, 33, 78, 78, 11, 66, 22, 22, 55, 69, 54])
+    return generate(bytearray(s), counter=int(time.time()) // 30)
 
 
 class SpotifyAnon(SpotifyAuthBase):
@@ -30,7 +76,7 @@ class SpotifyAnon(SpotifyAuthBase):
     ):
         """
         Creates a SpotifyAnon object
-        
+
         Parameters:
         * proxies: Optional, interpreted as boolean
         * requests_session: A Requests session
@@ -90,9 +136,16 @@ class SpotifyAnon(SpotifyAuthBase):
         """Gets client credentials access token """
         logger.debug("sending GET request to %s", self.TOKEN_URL)
 
+        totp = get_totp()
+
         try:
             response = self._session.get(
                 self.TOKEN_URL,
+                params={
+                    "productType": "web-player",
+                    "totp": totp,
+                    "totpVer": 5
+                },
                 verify=True,
                 proxies=self.proxies,
                 timeout=self.requests_timeout,
