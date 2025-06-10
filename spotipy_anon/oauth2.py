@@ -65,7 +65,7 @@ class SpotifyAnon(SpotifyAuthBase):
     """
     client_id: str  # was suggested by PyCharm
 
-    TOKEN_URL = "https://open.spotify.com/get_access_token"
+    TOKEN_URL = "https://open.spotify.com/api/token"
 
     def __init__(
             self,
