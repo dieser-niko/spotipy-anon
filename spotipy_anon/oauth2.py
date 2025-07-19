@@ -47,16 +47,11 @@ def generate(secret, algorithm='sha1', digits=6, counter=0):
     return str(otp).zfill(digits)
 
 
-def get_secret(inp):
-    secret = []
-    for index, item in enumerate(inp):
-        secret.append(str(item ^ ((index % 33) + 9)))
-    return [ord(item) for item in str("".join(secret))]
-
-
 def get_totp():
-    s = get_secret([12, 56, 76, 33, 88, 44, 88, 33, 78, 78, 11, 66, 22, 22, 55, 69, 54])
-    return generate(bytearray(s), counter=int(time.time()) // 30)
+    secret = [52, 54, 55, 54, 53, 53, 49, 48, 52, 55, 53, 51, 51, 49, 50, 54, 56, 49, 53, 49, 56, 52, 54, 55, 54, 51,
+              49, 49, 49, 49, 49, 50, 56, 55, 53, 50, 52, 49, 55, 56, 49, 49, 56, 54, 49, 56, 54, 56, 55, 49, 50, 55,
+              49, 49, 49, 57, 54, 57, 50]
+    return generate(bytearray(secret), counter=int(time.time()) // 30)
 
 
 class SpotifyAnon(SpotifyAuthBase):
