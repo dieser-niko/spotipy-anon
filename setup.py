@@ -7,7 +7,7 @@ with open("README.md", "r") as f:
 
 setup(
     name='spotipy_anon',
-    version='1.5.1',
+    version='1.5.2',
     description='An extension to Spotipy for anonymous access to the Spotify Web API',
     long_description=long_description,
     long_description_content_type="text/markdown",
