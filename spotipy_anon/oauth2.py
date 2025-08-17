@@ -47,9 +47,12 @@ def generate(secret, algorithm='sha1', digits=6, counter=0):
     return str(otp).zfill(digits)
 
 
-def get_totp():
-    secret = [53, 55, 52, 53, 55, 56, 49, 50, 52, 51, 50, 49, 48, 49, 49, 49, 49, 55, 56, 52, 48, 53, 56, 51, 50, 49,
-              49, 48, 49, 49, 57, 49, 48, 54, 57, 54, 49, 50, 53, 55, 53] # 2025-08-01
+def get_totp(session: requests.Session):
+    resp = session.get("https://github.com/Thereallo1026/spotify-secrets/blob/main/secrets/secretDict.json?raw=true")
+    resp.raise_for_status()
+    secrets = response.json()
+    version = max(secrets, key=int)
+    secret = secrets[version]
     return generate(bytearray(secret), counter=int(time.time()) // 30)
 
 
