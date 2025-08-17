@@ -46,14 +46,20 @@ def generate(secret, algorithm='sha1', digits=6, counter=0):
     otp = binary % (10 ** digits)
     return str(otp).zfill(digits)
 
+def get_secret(inp):
+    secret = []
+    for index, item in enumerate(inp):
+        secret.append(str(item ^ ((index % 33) + 9)))
+    return [ord(item) for item in str("".join(secret))]
+
 
 def get_totp(session: requests.Session):
     resp = session.get("https://github.com/Thereallo1026/spotify-secrets/blob/main/secrets/secretDict.json?raw=true")
     resp.raise_for_status()
-    secrets = response.json()
+    secrets = resp.json()
     version = max(secrets, key=int)
-    secret = secrets[version]
-    return generate(bytearray(secret), counter=int(time.time()) // 30)
+    secret_bytes = secrets[version]
+    return generate(bytearray(get_secret(secret_bytes)), counter=int(time.time()) // 30)
 
 
 class SpotifyAnon(SpotifyAuthBase):
@@ -133,7 +139,7 @@ class SpotifyAnon(SpotifyAuthBase):
         """Gets client credentials access token """
         logger.debug("sending GET request to %s", self.TOKEN_URL)
 
-        totp = get_totp(self.requests_session)
+        totp = get_totp(self._session)
 
         try:
             response = self._session.get(
