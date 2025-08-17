@@ -133,7 +133,7 @@ class SpotifyAnon(SpotifyAuthBase):
         """Gets client credentials access token """
         logger.debug("sending GET request to %s", self.TOKEN_URL)
 
-        totp = get_totp()
+        totp = get_totp(self.requests_session)
 
         try:
             response = self._session.get(
