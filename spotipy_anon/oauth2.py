@@ -54,7 +54,7 @@ def get_secret(inp):
 
 
 def get_totp(session: requests.Session):
-    resp = session.get("https://github.com/Thereallo1026/spotify-secrets/blob/main/secrets/secretDict.json?raw=true")
+    resp = session.get("https://git.gay/thereallo/totp-secrets/raw/branch/main/secrets/secretDict.json")
     resp.raise_for_status()
     secrets = resp.json()
     version = max(secrets, key=int)
